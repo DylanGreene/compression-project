@@ -1,0 +1,59 @@
+Research:
+
+	http://www.cs.dartmouth.edu/~mgm/Final%20Report.pdfy
+			
+_____________________________________________________________________________________________________________
+
+	Computerphile JPEG 3 videos:
+
+
+		https://www.youtube.com/watch?v=LFXN9PiOGtY
+			part 0: colorspaces
+
+
+		https://www.youtube.com/watch?v=n_uNPbdenRs
+			part 1 of JPEG: 
+
+
+		https://www.youtube.com/watch?v=Q2aEzeMDHMA
+			part 2: video on the use of the discrete cosine tranform in regards to JPEG image compression.
+
+_____________________________________________________________________________________________________________
+
+	http://www.ams.org/samplings/feature-column/fcarc-image-compression
+		Article outlines the step-by-step process that JPEG uses to compress images
+
+	http://disp.ee.ntu.edu.tw/meeting/%E4%BF%9D%E8%A8%80/Basic%20Image%20Compression%20Algorithm%20and%20Introduction%20of%20JPEG%20Standard/Basic%20Image%20Compression%20Algorithm%20and%20Introduction%20of%20JPEG%20Standard.pdf
+		Contains equations of the discrete cosine transform as well as the inverse discrete cosine transform on page 10. I've only looked at this briefly (and up to this part) but the equation for the DCT (discrete cosine transform) contains another equation (F(u, v), the DCT coefficient) which seems to be defined on the previous page, but the equation for F(u,v) contains the other equation.
+
+
+_____________________________________________________________________________________________________________
+
+	DevILL/OpenCV, still not sure which one is better, CV seems better documented though so I might try that:
+
+	http://stackoverflow.com/questions/13567336/how-to-access-the-rgb-values-in-opencv
+		This works to read the RGB data (the second one in the question).
+	http://stackoverflow.com/questions/15320267/package-opencv-was-not-found-in-the-pkg-config-search-path
+		Used this to fix something, not realy sure what but it helped
+	https://help.ubuntu.com/community/OpenCV
+		OpenCV Ubuntu installation and C++ loading an image file tutorial
+	http://opencv-srf.blogspot.com/2010/09/what-is-opencv.html
+		OpenCV Documentiaion/tutorial
+	http://www.geeks3d.com/20090105/tutorial-how-to-load-and-display-an-image-with-devil-and-opengl/
+		Really quick tutorial on DevIL
+	http://openil.sourceforge.net/download.php
+		install DevIL
+
+
+_____________________________________________________________________________________________________________
+
+
+
+
+	MISC NOTES:
+
+		-since we cannot see higher frequencies, any data dedicated to these higher frequencies can be removed.
+		-To compile using OpenCV (from https://help.ubuntu.com/community/OpenCV)
+		   1 $ g++ -ggdb `pkg-config --cflags opencv` -o `basename opencvtest.cpp .cpp` opencvtest.cpp `pkg-config --libs opencv`
+		   2 $ ./opencvtest
+		-I got OpenCV working for me, all I did was copy the progrm from https://help.ubuntu.com/community/OpenCV, I am going to work on how we can access each individual pixel's data now.
