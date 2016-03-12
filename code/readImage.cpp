@@ -39,16 +39,16 @@ class Image{
 
 
 int main(){
-	Mat image = imread("flower.jpg", CV_LOAD_IMAGE_COLOR); // reads in image into image object from the Matrix? class, not sure what CV_LO... is
-//	Mat ycbcr;
+	Mat image = imread("flower.jpg", CV_LOAD_IMAGE_COLOR); // reads in image into image object from the Matrix? class, not sure what CV_LO... is 
+//	Mat ycbcr; // this was code I found online to convert RGB to YcBcR, but i couldnt get CV_BGR2YCBCR to function
 //	cvtColor(image,ycbcr,CV_BGR2YCBCR);
 //	Mat chan[3];
 //	split(ycbcr,chan);
 //	Mat y = chan[0];
 //	Mat cb = chan[1];
 //	Mat cr = chan[2];
-	Image compressed(image.cols, image.rows, image);
-	compressed.displayFilter(image, 0);
+	Image compressed(image.cols, image.rows, image); 
+	compressed.displayFilter(image, 0);  // this doesn't do what I want it to do
 //	imshow("opencvtest", compressed.getCompressed()); // displays the image with title opencvtest
 //	imshow("ycbr", y);
 	waitKey(0); // not sure what this does
