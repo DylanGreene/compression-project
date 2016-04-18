@@ -64,7 +64,10 @@ int main(){
     Image compressed(image.cols, image.rows, image); 
     compressed.displayFilter(image, 0);  // this doesn't do what I want it to do
 	imshow("opencvtest", compressed.getCompressed()); // displays the image with title opencvtest
+	cout << "entering_divide_image" << endl;
+	Sub_Image subim( 100, 100, compressed.getCompressed(), 1, 1);
 //	compressed.divide_image();
+//  ^^^^^->>>>>segfault
 //	imshow("ycbr", y);
 //	imshow("luminance", y);
     imshow("lumiance", y);
@@ -100,12 +103,13 @@ Sub_Image::Sub_Image(int w, int h, Mat image, int num_row, int num_col){
     height = h;
     row = num_row;
     col = num_col;
+	Mat temp(width, height, 3, DataType<int>::type)
     for(int i = 0; i < width; i++){
         for(int j = 0; j < height; j++){
             // setting the self's color equal to its RGB position
-            self.at<Vec3b>(i, j)[2] = imageRGB[num_row*i][num_col*j][2];
-            self.at<Vec3b>(i, j)[1] = imageRGB[num_row*i][num_col*j][1];
-            self.at<Vec3b>(i, j)[0] = imageRGB[num_row*i][num_col*j][0];
+    //        self.at<Vec3b>(i, j)[2] = imageRGB[num_row*i][num_col*j][2];
+      //      self.at<Vec3b>(i, j)[1] = imageRGB[num_row*i][num_col*j][1];
+        //    self.at<Vec3b>(i, j)[0] = imageRGB[num_row*i][num_col*j][0];
             // does sub_image inherit vector,vectorRGB?
         }
     }
@@ -119,7 +123,6 @@ void Sub_Image::compress_sub_image(){
 	int y, cB, cR;
     for(int i = row; i < row + (width / 2); i++){
         for(int j = col; j < col + (height / 2); j++){
-
             // Blue Chromiance is stored here
             average_blue = (father.imageYBR[i][j][1] + father.imageYBR[i + 1][j][1] + father.imageYBR[i][j + 1][1] + father.imageYBR[i + 1][j + 1][1])/4;
 
@@ -153,13 +156,18 @@ void Sub_Image::compress_sub_image(){
 
 // divide image into 8x8 sub images
 void Image::divide_image(){
+	cout << "1" << endl;
     for(int i = 0; i < 8; i++){
         vector<Mat> temp;
+		cout << "2: " << i << endl;
         for(int j = 0; j < 8; j++){
+			cout << "3: " << j << endl;
             Sub_Image sub_image(width / 8, height / 8, getCompressed(), i, j);
-		//	sub_image.compress_sub_image();
+	//		sub_image.compress_sub_image();
+			imshow("sub-image", sub_image.self);
 			temp.push_back(sub_image.self); 
         }
+		cout << "4: " << i << endl;
         sub_images.push_back(temp);
         temp.clear();
     }
