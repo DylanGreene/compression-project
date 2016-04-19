@@ -21,33 +21,34 @@ class Image{
  public:
 	Image(){};
     Image(int w, int h, Mat image);
-    Mat getCompressed();
+    Mat getImage();
     void displayFilter(Mat, int);
-    void divide_image();
+    void divide_image(Image);		// divides image into 8x8 sub images
+	// 3-d vectors (widthxheightx3): represent RGB and YcBcR color spaces
     vector<vector<vector<int> > > imageRGB;//(w, vector<vector<int> >(w, vector<int>(3))); // 3-d vector to store the rgb data
     vector<vector<vector<int> > > imageYBR;//(h, vector<vector<int> >(w, vector<int>(3))); // 3-d vector to store the luminance,Cb,Cr data
 
-private:
-	Mat compressedImage = imread("flower.jpg", CV_LOAD_IMAGE_COLOR);
+ private:
+	Mat rawImage = imread("flower.jpg", CV_LOAD_IMAGE_COLOR);
 	int width;
 	int height;
 	vector<vector<Mat> > sub_images;// 2-d vector of sub-images
 };
 
-// sub image is an image: 8x8 sub images will be instantiated
+// sub image inherits from image: 8x8 sub images will be instantiated
 class Sub_Image: public Image{
  public:
 	Sub_Image();
-    Sub_Image(int w, int h, Mat image, int num_row, int num_col);
+    Sub_Image(int w, int h, Image image, int num_row, int num_col);
     void compress_sub_image();
     void cosine_transform();
 	Mat self;
  private:
-    int row;
-    int col;
-    int width;
-    int height;
-    Image father;
+    int row; 						// y position of sub-image relative to father
+    int col;						// x position of sub-image relative to father
+    int width;						// width of father / 8
+    int height;						// height of father / 2
+    Image father;					// father Image object
 };
 
 
@@ -63,10 +64,9 @@ int main(){
     Mat cb = filter[2];
     Image compressed(image.cols, image.rows, image); 
     compressed.displayFilter(image, 0);  // this doesn't do what I want it to do
-	imshow("opencvtest", compressed.getCompressed()); // displays the image with title opencvtest
-	cout << "entering_divide_image" << endl;
-	Sub_Image subim( 100, 100, compressed.getCompressed(), 1, 1);
-//	compressed.divide_image();
+	imshow("opencvtest", compressed.getImage()); // displays the image with title opencvtest
+//	Sub_Image subim( 100, 100, compressed, 1, 1);
+	compressed.divide_image(compressed);
 //  ^^^^^->>>>>segfault
 //	imshow("ycbr", y);
 //	imshow("luminance", y);
@@ -98,18 +98,20 @@ Sub_Image::Sub_Image(){
 }
 
 // non-default constructor for sub-image: sets Mat.color position to the imageRGB of inherited Image 
-Sub_Image::Sub_Image(int w, int h, Mat image, int num_row, int num_col){
+Sub_Image::Sub_Image(int w, int h, Image dad, int num_row, int num_col){
     width = w;
     height = h;
     row = num_row;
     col = num_col;
-	Mat temp(width, height, 3, DataType<int>::type)
+	father = dad;
+	Mat temp(width, height, 3, DataType<int>::type);
+	self = temp;
     for(int i = 0; i < width; i++){
         for(int j = 0; j < height; j++){
             // setting the self's color equal to its RGB position
-    //        self.at<Vec3b>(i, j)[2] = imageRGB[num_row*i][num_col*j][2];
-      //      self.at<Vec3b>(i, j)[1] = imageRGB[num_row*i][num_col*j][1];
-        //    self.at<Vec3b>(i, j)[0] = imageRGB[num_row*i][num_col*j][0];
+            self.at<Vec3b>(i, j)[2] = father.imageRGB[num_row*i][num_col*j][2];
+            self.at<Vec3b>(i, j)[1] = father.imageRGB[num_row*i][num_col*j][1];
+            self.at<Vec3b>(i, j)[0] = father.imageRGB[num_row*i][num_col*j][0];
             // does sub_image inherit vector,vectorRGB?
         }
     }
@@ -155,14 +157,14 @@ void Sub_Image::compress_sub_image(){
 }
 
 // divide image into 8x8 sub images
-void Image::divide_image(){
+void Image::divide_image(Image image){
 	cout << "1" << endl;
     for(int i = 0; i < 8; i++){
         vector<Mat> temp;
 		cout << "2: " << i << endl;
         for(int j = 0; j < 8; j++){
 			cout << "3: " << j << endl;
-            Sub_Image sub_image(width / 8, height / 8, getCompressed(), i, j);
+            Sub_Image sub_image(width / 8, height / 8, image, i, j);
 	//		sub_image.compress_sub_image();
 			imshow("sub-image", sub_image.self);
 			temp.push_back(sub_image.self); 
@@ -207,6 +209,6 @@ Image::Image(int w, int h, Mat image){
 }
 
 
-Mat Image::getCompressed(){
-    return compressedImage;
+Mat Image::getImage(){
+    return rawImage;
 }
