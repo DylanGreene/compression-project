@@ -22,8 +22,6 @@ class SubImage{
 		Mat getSubImage();
 		int getRow();
 		int getCol();
-		int getHeight();
-		int getWidth();
 
 	private:
 		Mat subIm; //the sub image
@@ -35,9 +33,9 @@ class SubImage{
 		int row;
 		int col;
 
-		//dims of sub image
-		int width;
-		int height;
+		//member helper functions
+		void fillRGB();
+		void fillYCbCr();
 };
 
 //*************************************************************************************************//
@@ -47,8 +45,7 @@ class SubImage{
 //Inherits from SubImage (Compressed SubImage IS a SubImage
 class CompressedSubImage: public SubImage{
 	public:
-		CompressedSubImage(); //default contructor
-		CompressedSubImage();
+		CompressedSubImage(); //constructor
 
 	private:
 		vector< vector< vector<int> > > compressedRGB;
@@ -68,10 +65,10 @@ class CompressedImage{
 
 	private:
 		SubImage subIms;
-		vector< vector<CompressedSubImage> >;
+		vector< vector<CompressedSubImage> > compressedSubIms;
 		Mat compressedIm;
 
-		vector< vector<CompressedSubImage> > compressSubIms()
+		vector< vector<CompressedSubImage> > compressSubIms();
 };
 
 //*************************************************************************************************//
@@ -111,8 +108,19 @@ class Image{
 //constructor
 Image::Image(string fp){
 	imagePath = fp;
-	image = imread(imagePath, CV_LOAD_IMAGE_COLOR); //read the image into a Mat
-	
+	image = imread(imagePath, CV_LOAD_IMAGE_COLOR); //read the image into a Mat	
+    /*
+        imread second argument options for future reference:
+        CV_LOAD_IMAGE_UNCHANGED (<0) loads the image as is (including the alpha channel if present)
+        CV_LOAD_IMAGE_GRAYSCALE ( 0) loads the image as an intensity one
+        CV_LOAD_IMAGE_COLOR (>0) loads the image in the BGR format
+    */
+
+    if(!image.data ){ //checking that image data was correctly loaded
+        cout << "Could not open or find the image" << endl ;
+        exit(-1);
+    }
+
 	//set the image width and height
 	width = image.cols;
 	height = image.rows;
@@ -126,9 +134,9 @@ Image::Image(string fp){
 }
 
 void Image::divideImage(){
-	for(int i = 0; i < 8; i++){
+	for(int i = 0; i < height/8; i++){
 		vector<SubImage> tmp;
-		for(int j = 0; j < 8; j++){
+		for(int j = 0; j < width/8; j++){
 			SubImage tmpSubImage(image, i, j);
 			tmp.push_back(tmpSubImage);
 		}
@@ -155,12 +163,13 @@ void Image::fillRGB(){
 			tmpRGB.push_back(innerTmpRGB);
 			innerTmpRGB.clear();
 		}
-		RGB.push_back(tempRGB);
-		tempRGB.clear();
+		RGB.push_back(tmpRGB);
+		tmpRGB.clear();
 	}
 }
 
 void Image::fillYCbCr(){
+	int r, g, b;
 	vector< vector<int> > tmpYCbCr;
 	vector<int> innerTmpYCbCr;
 	
@@ -177,8 +186,8 @@ void Image::fillYCbCr(){
 			tmpYCbCr.push_back(innerTmpYCbCr);
 			innerTmpYCbCr.clear();
 		}
-		YCbCr.push_back(tempYCbCr);
-		tempYCbCr.clear();
+		YCbCr.push_back(tmpYCbCr);
+		tmpYCbCr.clear();
 	}
 }
 
@@ -229,6 +238,7 @@ void Image::displayFilter(int n){
 				case 5:
 					imshow("Red Chrominance", tmp);
 			}
+    		waitKey(0); //wait for a keystroke in the window (parameter is how long it should wait in milli: 0 is forever)
 		}
 	}
 }
@@ -256,7 +266,73 @@ vector< vector< vector<int> > > Image::getYCbCr(){
 //SubImage Class Implementation//
 //************************************************************************************************//
 
+SubImage::SubImage(Mat im, int r, int c){
+	subIm = im;
+	row = r;
+	col = c;
 
+	fillRGB();
+	fillYCbCr();
+}
+
+void SubImage::fillRGB(){
+	int r, g, b;
+	vector< vector<int> > tmpRGB;
+	vector<int> innerTmpRGB;
+	
+	for(int i = row; i < row + 8; i++){
+		for(int j = col; j < col + 8; j++){
+			r = subIm.at<Vec3b>(i, j)[2];
+			g = subIm.at<Vec3b>(i, j)[1];
+			b = subIm.at<Vec3b>(i, j)[0];
+
+			innerTmpRGB.push_back(r);
+			innerTmpRGB.push_back(g);
+			innerTmpRGB.push_back(b);
+			
+			tmpRGB.push_back(innerTmpRGB);
+			innerTmpRGB.clear();
+		}
+		RGB.push_back(tmpRGB);
+		tmpRGB.clear();
+	}
+}
+
+void SubImage::fillYCbCr(){
+	int r, g, b;
+	vector< vector<int> > tmpYCbCr;
+	vector<int> innerTmpYCbCr;
+	
+	for(int i = row; i < row + 8; i++){
+		for(int j = col; j < col + 8; j++){
+			r = subIm.at<Vec3b>(i, j)[2];
+			g = subIm.at<Vec3b>(i, j)[1];
+			b = subIm.at<Vec3b>(i, j)[0];
+
+			innerTmpYCbCr.push_back(r*0.299 + g*0.587 + b*0.114);
+			innerTmpYCbCr.push_back(r*-0.16874 + g*-0.33126 + b*0.5);
+			innerTmpYCbCr.push_back(r*0.5 + g*-0.41869 + b*-0.08131);
+			
+			tmpYCbCr.push_back(innerTmpYCbCr);
+			innerTmpYCbCr.clear();
+		}
+		YCbCr.push_back(tmpYCbCr);
+		tmpYCbCr.clear();
+	}
+}
+
+
+Mat SubImage::getSubImage(){
+	return subIm;
+}
+
+int SubImage::getRow(){
+	return row;
+}
+
+int SubImage::getCol(){
+	return col;
+}
 
 //************************************************************************************************//
 //CompressedSubImage Class Implementation//
@@ -275,24 +351,9 @@ int main(int argc, char** argv){
      cout << " Usage: ./readAndDisp ImageToLoadAndDisplay" << endl;
      return -1;
     }
+	string imPath = argv[1];
 
-    Mat image; //stores teh data of the loaded image
-    image = imread(argv[1], CV_LOAD_IMAGE_COLOR); //loads the image name in BGR format
-    /*
-        imread second argument options for future reference:
-        CV_LOAD_IMAGE_UNCHANGED (<0) loads the image as is (including the alpha channel if present)
-        CV_LOAD_IMAGE_GRAYSCALE ( 0) loads the image as an intensity one
-        CV_LOAD_IMAGE_COLOR (>0) loads the image in the BGR format
-    */
-
-    if(!image.data ){ //checking that image data was correctly loaded
-        cout << "Could not open or find the image" << endl ;
-        return -1;
-    }
-
-    namedWindow("Display window", WINDOW_AUTOSIZE); //create a window for display
-    imshow("Display window", image); //display the image in the window
-
-    waitKey(0); //wait for a keystroke in the window (parameter is how long it should wait in milli: 0 is forever)
+	Image im(imPath);
+	
     return 0;
 }

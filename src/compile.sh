@@ -1,4 +1,4 @@
 #!/bin/sh
 
-g++ readImage.cpp -o readImage `pkg-config --cflags --libs opencv` -std=gnu++11
-
+execName=$(echo $(basename $1) | cut -d. -f1)
+g++ $1 -o $execName `pkg-config --cflags --libs opencv` -std=gnu++11
