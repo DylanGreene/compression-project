@@ -10,5 +10,6 @@
 04/17-4/18/2016: 6 hours - Working to get OpenCV functioning; added Sub-Image class and implemented sub-image methods
 04/18/2016: 40 m - In lab presentation and fixing segmentation fault
 04/19/2016: 5 hours - Team meeting restructuring our program using inheritance and composition
-
+04/22/2016: 1 hour - Team meeing fixing git repository issue after messed up merge 
+04/24/2016: 2 hours - Team meeting finishing Image class
 
