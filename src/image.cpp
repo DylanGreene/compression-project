@@ -39,51 +39,20 @@ class SubImage{
 };
 
 //*************************************************************************************************//
-//Compressed SubImage Definition//
-//*************************************************************************************************//
-
-//Inherits from SubImage (Compressed SubImage IS a SubImage
-class CompressedSubImage: public SubImage{
-	public:
-		CompressedSubImage(); //constructor
-
-	private:
-		vector< vector< vector<int> > > compressedRGB;
-		vector< vector< vector<int> > > compressedYCbCr;
-		Mat compressedSubIm;
-};
-
-//*************************************************************************************************//
-//CompressedImage Class Definition//
-//*************************************************************************************************//
-
-//Composed of CompressedSubImage(s)
-class CompressedImage{
-	public:
-		CompressedImage();
-		CompressedImage(vector< vector<SubImage> > subIms);
-
-	private:
-		SubImage subIms;
-		vector< vector<CompressedSubImage> > compressedSubIms;
-		Mat compressedIm;
-
-		vector< vector<CompressedSubImage> > compressSubIms();
-};
-
-//*************************************************************************************************//
 //Image Class Defintion//
 //*************************************************************************************************//
 
 //Composed of SubImage(s)
 class Image{ 
 	public:
+		Image();
 		Image(string fp); //non default constructor which takes an OpenCV Mat
 		
-		void displayFilter(int n); //displays y, Cb or Cr based on the int passed (0, 1 or 2)
+		void displayFilter(int n); 
 
 		//accessors
 		Mat getImage(); //returns the OpenCV Mat of the image
+		vector< vector<SubImage> > getSubIms();
 		vector< vector< vector<int> > > getRGB(); //returns 3D vector of RGB data
 		vector< vector< vector<int> > > getYCbCr(); //returns 3D vector of YCbCr data
 
@@ -97,15 +66,40 @@ class Image{
 		vector< vector<SubImage> > subIms;
 
 		void divideImage(); //divided image into 8x8 sub images
+		
+	protected:
 		void fillRGB();
 		void fillYCbCr();
 };
 
+//*************************************************************************************************//
+//CompressedImage Class Definition//
+//*************************************************************************************************//
+
+//inherits from Image
+class CompressedImage: public Image{
+	public:
+		CompressedImage(Image im);
+
+	private:
+		Image image;
+		vector< vector<SubImage> > subIms;
+		vector< vector<SubImage> > compressedSubIms;
+		Mat compressedIm;
+		vector< vector< vector<int> > > RGB;
+		vector< vector< vector<int> > > YCbCr;
+		void compressYCbCrAverages(SubImage si);
+		void compressDiscreteCosine(SubImage csi);
+		
+		void compressSubIms();
+		void compressIm();
+};
 //************************************************************************************************//
 //Image Class Implementation//
 //************************************************************************************************//
 
 //constructor
+Image::Image(){}
 Image::Image(string fp){
 	imagePath = fp;
 	image = imread(imagePath, CV_LOAD_IMAGE_COLOR); //read the image into a Mat	
@@ -198,53 +192,76 @@ void Image::displayFilter(int n){
 	for(int i = 0; i < height; i++){
 		for(int j = 0; j < width; j++){
 			switch(n){
-				case 0: 
+				case 0:
+					tmp.at<Vec3b>(i, j)[2] = RGB[i][j][0];
+					tmp.at<Vec3b>(i, j)[1] = RGB[i][j][1];
+					tmp.at<Vec3b>(i, j)[0] = RGB[i][j][2];
+					break;
+				case 1:
 					tmp.at<Vec3b>(i, j)[2] = RGB[i][j][0];
 					tmp.at<Vec3b>(i, j)[1] = 0;
 					tmp.at<Vec3b>(i, j)[0] = 0;
-				case 1: 					
+					break;
+				case 2: 					
 					tmp.at<Vec3b>(i, j)[2] = 0;
 					tmp.at<Vec3b>(i, j)[1] = RGB[i][j][1];
 					tmp.at<Vec3b>(i, j)[0] = 0;
-				case 2: 
+					break;
+				case 3: 
 					tmp.at<Vec3b>(i, j)[2] = 0;
 					tmp.at<Vec3b>(i, j)[1] = 0;
 					tmp.at<Vec3b>(i, j)[0] = RGB[i][j][2];
-				case 3:
+					break;
+				case 4:
 					tmp.at<Vec3b>(i, j)[2] = YCbCr[i][j][0]*0.2362797506;
 					tmp.at<Vec3b>(i, j)[1] = YCbCr[i][j][0]*0.2362797506;
 					tmp.at<Vec3b>(i, j)[0] = YCbCr[i][j][0]*0.2362797506;
-				case 4:
+					break;
+				case 5:
 					tmp.at<Vec3b>(i, j)[2] = YCbCr[i][j][1]*-0.00000169;
 					tmp.at<Vec3b>(i, j)[1] = YCbCr[i][j][1]*-0.08131169;
 					tmp.at<Vec3b>(i, j)[0] = YCbCr[i][j][1]*0.41868831;
-				case 5:
+					break;
+				case 6:
 					tmp.at<Vec3b>(i, j)[2] = YCbCr[i][j][2]*0.33126364;
 					tmp.at<Vec3b>(i, j)[1] = YCbCr[i][j][2]*-0.16873636;
 					tmp.at<Vec3b>(i, j)[0] = YCbCr[i][j][2]*0.0000037;
+					break;
 
 			}
-			switch(n){
-				case 0: 
-					imshow("Red Channel", tmp);
-				case 1:
-					imshow("Green Channel", tmp);
-				case 2:
-					imshow("Blue Channel", tmp);
-				case 3:
-					imshow("Luminance", tmp);
-				case 4:
-					imshow("Blue Chrominance", tmp);
-				case 5:
-					imshow("Red Chrominance", tmp);
-			}
-    		waitKey(0); //wait for a keystroke in the window (parameter is how long it should wait in milli: 0 is forever)
 		}
+	}
+	switch(n){
+		case 0:
+			imshow("Image", tmp);
+			break;
+		case 1:	
+			imshow("Red Channel", tmp);
+			break;
+		case 2:
+			imshow("Green Channel", tmp);
+			break;
+		case 3:
+			imshow("Blue Channel", tmp);
+			break;
+		case 4:
+			imshow("Luminance", tmp);
+			break;
+		case 5:
+			imshow("Blue Chrominance", tmp);
+			break;
+		case 6:
+			imshow("Red Chrominance", tmp);
+			break;
 	}
 }
 
 Mat Image::getImage(){
 	return image;
+}
+
+vector< vector<SubImage> > Image::getSubIms(){
+	return subIms;
 }
 
 vector< vector< vector<int> > > Image::getRGB(){
@@ -260,6 +277,57 @@ vector< vector< vector<int> > > Image::getYCbCr(){
 //Compressed Image Class Implementation//
 //************************************************************************************************//
 
+//inherits from Image
+CompressedImage::CompressedImage(Image im){
+	image = im;
+	subIms = getSubIms();
+	compressedSubIms = subIms;
+	compressedIm = getImage();
+
+	compressIm();
+
+	fillRGB();
+	fillYCbCr();
+}
+
+void CompressedImage::compressIm(){
+	compressSubIms();
+	//other sh**
+}
+
+
+void CompressedImage::compressSubIms(){
+	for(int i = 0; i < subIms.size(); i++){
+		for(int j = 0; j < subIms[0].size(); j++){
+			compressYCbCrAverages(subIms[i][j]);
+			compressDiscreteCosine(compressedSubIms[i][j]);
+		}
+	}
+}
+
+void CompressedImage::compressYCbCrAverages(SubImage si){
+	int averageCb = 0;
+	int averageCr = 0;
+	int y, Cb, Cr;
+
+	for(int i = si.row; i < si.row + 4; i+=2){
+		for(int j = si.col; j < si.col + 4; j+=2){
+			for(int k = 0; k < 2; k++){
+				for(int l = 0; l < 2; l++){
+					averageCb += YCbCr[i+k][j+l][1];
+					averageCr += YCbCr[i+k][j+l][2];
+				}
+			}
+			averageCb /= 4;
+			averageCr /= 4;
+		}
+	}
+
+}
+
+void CompressedImage::compressDiscreteCosine(SubImage csi){
+
+}
 
 
 //************************************************************************************************//
@@ -335,12 +403,6 @@ int SubImage::getCol(){
 }
 
 //************************************************************************************************//
-//CompressedSubImage Class Implementation//
-//************************************************************************************************//
-
-
-
-//************************************************************************************************//
 //Main//
 //************************************************************************************************//
 
@@ -354,6 +416,11 @@ int main(int argc, char** argv){
 	string imPath = argv[1];
 
 	Image im(imPath);
-	
+	im.displayFilter(3);
+	im.displayFilter(5);
+
+	CompressedImage compressedIm(im);
+
+	waitKey(0); //wait for a keystroke in the window (parameter is how long it should wait in milli: 0 is forever)
     return 0;
 }
