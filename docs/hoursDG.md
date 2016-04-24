@@ -14,3 +14,5 @@
 04/19/2016: 5 h - Team meeting restructuring our program using inhertance and composition
 04/20/2016: 1 h - More work on implementing inheritance classes
 04/20/2016: 30 m - In lab presentation and also trying to fix a corrupted double linked list
+04/22/2016: 1 h - Team meeting fixing git repository issue after messed up merge
+04/24/2016: 2 h - Group meeting working on and finishing the Image class
