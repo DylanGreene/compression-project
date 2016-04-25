@@ -18,3 +18,5 @@
 04/24/2016: 2 h - Group meeting working on and finishing the Image class
 04/24/2016: 2 h 40 m - Group pair programming to work on the SubImage and CompressedImage classes
 04/24/2016: 3 h 30 m - Group pair programming working on the CompressedImage class as well as the powerpoint presestation
+04/25/22016: 2 h 10 m - More research and code planning on implementing the Discrete Cosine Transform
+

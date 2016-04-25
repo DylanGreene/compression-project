@@ -22,6 +22,8 @@ class SubImage{
 		Mat getSubImage();
 		int getRow();
 		int getCol();
+		vector< vector< vector<int> > > getRGB();
+		vector< vector< vector<int> > > getYCbCr();
 
 	private:
 		Mat subIm; //the sub image
@@ -280,20 +282,36 @@ vector< vector< vector<int> > > Image::getYCbCr(){
 //inherits from Image
 CompressedImage::CompressedImage(Image im){
 	image = im;
-	subIms = getSubIms();
+	subIms = image.getSubIms();
 	compressedSubIms = subIms;
-	compressedIm = getImage();
+	compressedIm = image.getImage();
 
-	compressIm();
+	//fillRGB();
+	//fillYCbCr();
 
-	fillRGB();
-	fillYCbCr();
+	//compressIm();
+
 }
 
 void CompressedImage::compressIm(){
 	compressSubIms();
 	
-	
+	for(int i = 0; i < compressedIm.rows; i++){
+		for(int j = 0; j < compressedIm.cols; j++){
+			
+			SubImage tmp = subIms[i][j];
+		
+			for(int k = 0; k < 8; k++){
+				for(int l = 0; l < 8; l++){
+					RGB = tmp.getRGB();
+					compressedIm.at<Vec3b>(i+k, j+l)[2] = RGB[k][l][0];
+					compressedIm.at<Vec3b>(i+k, j+l)[1] = RGB[k][l][1];
+					compressedIm.at<Vec3b>(i+k, j+l)[0] = RGB[k][l][2];
+				}
+			}
+
+		}
+	}
 }
 
 
@@ -418,6 +436,14 @@ int SubImage::getCol(){
 	return col;
 }
 
+vector< vector< vector<int> > > SubImage::getRGB(){
+	return RGB;
+}
+
+vector< vector< vector<int> > > SubImage::getYCbCr(){
+	return YCbCr;
+}
+
 //************************************************************************************************//
 //Main//
 //************************************************************************************************//
@@ -433,15 +459,18 @@ int main(int argc, char** argv){
 
 	Image im(imPath);
 	im.displayFilter(0);
+	/*
 	im.displayFilter(1);
 	im.displayFilter(2);
 	im.displayFilter(3);
 	im.displayFilter(4);
 	im.displayFilter(5);
 	im.displayFilter(6);
-
+	*/
 
 	CompressedImage compressedIm(im);
+	compressedIm.displayFilter(0);
+
 
 	waitKey(0); //wait for a keystroke in the window (parameter is how long it should wait in milli: 0 is forever)
     return 0;
