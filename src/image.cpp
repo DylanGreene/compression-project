@@ -432,8 +432,14 @@ int main(int argc, char** argv){
 	string imPath = argv[1];
 
 	Image im(imPath);
+	im.displayFilter(0);
+	im.displayFilter(1);
+	im.displayFilter(2);
 	im.displayFilter(3);
+	im.displayFilter(4);
 	im.displayFilter(5);
+	im.displayFilter(6);
+
 
 	CompressedImage compressedIm(im);
 
