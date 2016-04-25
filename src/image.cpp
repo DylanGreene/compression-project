@@ -292,7 +292,8 @@ CompressedImage::CompressedImage(Image im){
 
 void CompressedImage::compressIm(){
 	compressSubIms();
-	//other sh**
+	
+	
 }
 
 
@@ -308,10 +309,10 @@ void CompressedImage::compressSubIms(){
 void CompressedImage::compressYCbCrAverages(SubImage si){
 	int averageCb = 0;
 	int averageCr = 0;
-	int y, Cb, Cr;
+	int Y, Cb, Cr;
 
-	for(int i = si.row; i < si.row + 4; i+=2){
-		for(int j = si.col; j < si.col + 4; j+=2){
+	for(int i = si.getRow(); i < si.getRow() + 4; i+=2){
+		for(int j = si.getCol(); j < si.getCol() + 4; j+=2){
 			for(int k = 0; k < 2; k++){
 				for(int l = 0; l < 2; l++){
 					averageCb += YCbCr[i+k][j+l][1];
@@ -320,13 +321,28 @@ void CompressedImage::compressYCbCrAverages(SubImage si){
 			}
 			averageCb /= 4;
 			averageCr /= 4;
+			
+			for(int k = 0; k < 2; k++){
+				for(int l = 0; l < 2; l++){
+					YCbCr[i+k][j+l][1] = averageCb;
+					YCbCr[i+k][j+l][2] = averageCr;
+
+					Y = YCbCr[i+k][j+l][0]; 
+					Cb = YCbCr[i+k][j+l][1]; 
+					Cr = YCbCr[i+k][j+l][2]; 
+					
+					RGB[i+k][j+l][0] = 0.2362797506*Y - 0.00000169*Cb + 0.33126364*Cr;
+					RGB[i+k][j+l][1] = 0.2362797506*Y - 0.08131169*Cb - 0.16873636*Cr;
+					RGB[i+k][j+l][2] = 0.2362797506*Y + 0.41868831*Cb + 0.00000364*Cr;
+				}
+			}			
 		}
 	}
 
 }
 
 void CompressedImage::compressDiscreteCosine(SubImage csi){
-
+	
 }
 
 
