@@ -23,6 +23,7 @@ class SubImage{
 		int getRow();
 		int getCol();
 		vector< vector< vector<int> > > getRGB();
+		int getRGB(int i, int j, int n);
 		vector< vector< vector<int> > > getYCbCr();
 
 	private:
@@ -288,12 +289,11 @@ CompressedImage::CompressedImage(Image im){
 	subIms = image.getSubIms();
 	compressedSubIms = subIms;
 	compressedIm = image.getImage();
-	
-	fillRGB();
-	fillYCbCr();
 
 	compressIm();
 
+	fillRGB();
+	fillYCbCr();
 }
 
 void CompressedImage::compressIm(){
@@ -301,29 +301,16 @@ void CompressedImage::compressIm(){
 	
 	for(int i = 0; i < compressedIm.rows; i++){
 		for(int j = 0; j < compressedIm.cols; j++){
-					
-			vector< vector< vector<int> > > rgb;
-			vector< vector<int> > tmpRGB;
-			vector<int> innerTmpRGB;
-			
-			for(int k = 0 ; k < compressedIm.rows; k++){
-				for(int l = 0; l < compressedIm.cols; k++){
-					innerTmpRGB.push_back(subIms[k][l].getRGB()[k][l][0]);
-					innerTmpRGB.push_back(subIms[k][l].getRGB()[k][l][1]);
-					innerTmpRGB.push_back(subIms[k][l].getRGB()[k][l][2]);
-					
-					tmpRGB.push_back(innerTmpRGB);
-					innerTmpRGB.clear();
-				}
-				rgb.push_back(tmpRGB);
-				tmpRGB.clear();
-			}
 			
 			for(int k = 0; k < 8; k++){
 				for(int l = 0; l < 8; l++){
-					//compressedIm.at<Vec3b>(i+k, j+l)[2] = rgb[k][l][0];
-					//compressedIm.at<Vec3b>(i+k, j+l)[1] = RGB[k][l][1];
-					//compressedIm.at<Vec3b>(i+k, j+l)[0] = RGB[k][l][2];
+					
+					imshow("test", subIms[floor(i/8)][floor(j/8)]);
+
+					compressedIm.at<Vec3b>(i, j)[2] = subIms[floor(i/8)][floor(j/8)].getRGB(k, l, 0);
+					compressedIm.at<Vec3b>(i, j)[1] = subIms[floor(i/8)][floor(j/8)].getRGB(k, l, 1);
+					compressedIm.at<Vec3b>(i, j)[0] = subIms[floor(i/8)][floor(j/8)].getRGB(k, l, 2);
+					
 				}
 			}
 
@@ -571,6 +558,10 @@ int SubImage::getCol(){
 
 vector< vector< vector<int> > > SubImage::getRGB(){
 	return RGB;
+}
+
+int SubImage::getRGB(int i, int j, int n){
+	return RGB[i][j][n];
 }
 
 vector< vector< vector<int> > > SubImage::getYCbCr(){
