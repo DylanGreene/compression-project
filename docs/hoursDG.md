@@ -20,4 +20,5 @@
 04/24/2016: 3 h 30 m - Group pair programming working on the CompressedImage class as well as the powerpoint presestation
 04/25/2016: 2 h 10 m - More research and code planning on implementing the Discrete Cosine Transform
 04/25/2016: 2 h 30 m - Trying to implement the recobination of SubImages into a single CompressedImage
-
+04/25/2016: 4 h 50 m - Group pair programming working on implementing the down sampling aspect of the compression
+04/26/2016: 1 h 40 m - Restructing classes, making separate .h and .cpp files, documenting code by adding comments and explanations
