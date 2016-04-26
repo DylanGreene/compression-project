@@ -134,9 +134,9 @@ Image::Image(string fp){
 }
 
 void Image::divideImage(){
-	for(int i = 0; i < height/8; i++){
+	for(int i = 0; i < height; i+=8){
 		vector<SubImage> tmp;
-		for(int j = 0; j < width/8; j++){
+		for(int j = 0; j < width; j+=8){
 			SubImage tmpSubImage(image, i, j);
 			tmp.push_back(tmpSubImage);
 		}
@@ -194,7 +194,7 @@ void Image::fillYCbCr(){
 //displays y, Cb or Cr based on the int passed (0-5)
 //0: r, 1: g, 2: b, 3: Y, 4: Cb, 5: Cr
 void Image::displayFilter(int n){
-	Mat tmp = image;
+	Mat tmp = image.clone();
 	for(int i = 0; i < height; i++){
 		for(int j = 0; j < width; j++){
 			switch(n){
@@ -288,28 +288,30 @@ CompressedImage::CompressedImage(Image im){
 	image = im;
 	subIms = image.getSubIms();
 	compressedSubIms = subIms;
-	compressedIm = image.getImage();
+	compressedIm = image.getImage().clone();
 
+	fillRGB();
+	fillYCbCr();
+	
 	compressIm();
 
 	fillRGB();
 	fillYCbCr();
+
 }
 
 void CompressedImage::compressIm(){
-	//compressSubIms();
-	
-	for(int i = 0; i < compressedIm.rows; i++){
-		for(int j = 0; j < compressedIm.cols; j++){
+	compressSubIms();
+
+	for(int i = 0; i < compressedIm.rows / 8; i++){
+		for(int j = 0; j < compressedIm.cols / 8; j++){
 			
 			for(int k = 0; k < 8; k++){
-				for(int l = 0; l < 8; l++){
-					
-					imshow("test", subIms[floor(i/8)][floor(j/8)]);
+				for(int l = 0; l < 8; l++){	
 
-					compressedIm.at<Vec3b>(i, j)[2] = subIms[floor(i/8)][floor(j/8)].getRGB(k, l, 0);
-					compressedIm.at<Vec3b>(i, j)[1] = subIms[floor(i/8)][floor(j/8)].getRGB(k, l, 1);
-					compressedIm.at<Vec3b>(i, j)[0] = subIms[floor(i/8)][floor(j/8)].getRGB(k, l, 2);
+					compressedIm.at<Vec3b>(i+k, j+l)[2] = subIms[i][j].getRGB(k, l, 0);
+					compressedIm.at<Vec3b>(i+k, j+l)[1] = subIms[i][j].getRGB(k, l, 1);
+					compressedIm.at<Vec3b>(i+k, j+l)[0] = subIms[i][j].getRGB(k, l, 2);
 					
 				}
 			}
@@ -333,19 +335,19 @@ void CompressedImage::compressYCbCrAverages(SubImage si){
 	int averageCr = 0;
 	int Y, Cb, Cr;
 
-	for(int i = si.getRow(); i < si.getRow() + 4; i+=2){
-		for(int j = si.getCol(); j < si.getCol() + 4; j+=2){
-			for(int k = 0; k < 2; k++){
-				for(int l = 0; l < 2; l++){
+	for(int i = si.getRow(); i < si.getRow() + 4; i++){
+		for(int j = si.getCol(); j < si.getCol() + 4; j++){
+			for(int k = 0; k < 4; k++){
+				for(int l = 0; l < 4; l++){
 					averageCb += YCbCr[i+k][j+l][1];
 					averageCr += YCbCr[i+k][j+l][2];
 				}
 			}
-			averageCb /= 4;
-			averageCr /= 4;
-			
-			for(int k = 0; k < 2; k++){
-				for(int l = 0; l < 2; l++){
+			averageCb /= 16;
+			averageCr /= 16;
+
+			for(int k = 0; k < 4; k++){
+				for(int l = 0; l < 4; l++){
 					YCbCr[i+k][j+l][1] = averageCb;
 					YCbCr[i+k][j+l][2] = averageCr;
 
@@ -353,11 +355,15 @@ void CompressedImage::compressYCbCrAverages(SubImage si){
 					Cb = YCbCr[i+k][j+l][1]; 
 					Cr = YCbCr[i+k][j+l][2]; 
 					
-					RGB[i+k][j+l][0] = 0.2362797506*Y - 0.00000169*Cb + 0.33126364*Cr;
-					RGB[i+k][j+l][1] = 0.2362797506*Y - 0.08131169*Cb - 0.16873636*Cr;
-					RGB[i+k][j+l][2] = 0.2362797506*Y + 0.41868831*Cb + 0.00000364*Cr;
+					RGB[i+k][j+l][0] = Y + 1.402*(Cr);
+					RGB[i+k][j+l][1] = Y - 0.34414*(Cb) - 0.71414*(Cr);
+					RGB[i+k][j+l][2] = Y + 1.772*(Cb);
 				}
-			}			
+			}
+
+			averageCb = 0;
+			averageCr = 0;
+			
 		}
 	}
 
@@ -370,7 +376,7 @@ void CompressedImage::compressDiscreteCosine(SubImage csi){
 //displays y, Cb or Cr based on the int passed (0-5)
 //0: r, 1: g, 2: b, 3: Y, 4: Cb, 5: Cr
 void CompressedImage::displayFilter(int n){
-	Mat tmp = compressedIm;
+	Mat tmp = compressedIm.clone();
 	for(int i = 0; i < compressedIm.rows; i++){
 		for(int j = 0; j < compressedIm.cols; j++){
 			switch(n){
@@ -416,24 +422,31 @@ void CompressedImage::displayFilter(int n){
 	switch(n){
 		case 0:
 			imshow("Compressed Image", tmp);
+			imwrite("result.jpg", tmp);
 			break;
 		case 1:	
 			imshow("Compressed Red Channel", tmp);
+			imwrite("result.jpg", tmp);
 			break;
 		case 2:
 			imshow("Compressed Green Channel", tmp);
+			imwrite("result.jpg", tmp);
 			break;
 		case 3:
 			imshow("Compressed Blue Channel", tmp);
+			imwrite("result.jpg", tmp);
 			break;
 		case 4:
 			imshow("Compressed Luminance", tmp);
+			imwrite("result.jpg", tmp);
 			break;
 		case 5:
 			imshow("Compressed Blue Chrominance", tmp);
+			imwrite("result.jpg", tmp);
 			break;
 		case 6:
 			imshow("Compressed Red Chrominance", tmp);
+			imwrite("result.jpg", tmp);
 			break;
 	}
 }
@@ -489,12 +502,32 @@ void CompressedImage::fillYCbCr(){
 //************************************************************************************************//
 
 SubImage::SubImage(Mat im, int r, int c){
-	subIm = im;
+	subIm = im.clone();
 	row = r;
 	col = c;
 
 	fillRGB();
 	fillYCbCr();
+	/*
+	 * Used for testing
+	 *
+	for(int i = 0; i < subIm.rows; i++){
+		for(int j = 0; j < subIm.cols; j++){
+			
+			if(i >= row && i < row+8 && j >= col && j < col+8){		
+				subIm.at<Vec3b>(i, j)[2] = RGB[i-row][j-col][0];
+				subIm.at<Vec3b>(i, j)[1] = RGB[i-row][j-col][1];
+				subIm.at<Vec3b>(i, j)[0] = RGB[i-row][j-col][2];
+				continue;
+			}
+
+			subIm.at<Vec3b>(i, j)[2] = 0;
+			subIm.at<Vec3b>(i, j)[1] = 0;
+			subIm.at<Vec3b>(i, j)[0] = 0;
+			
+		}
+	}
+	*/
 }
 
 void SubImage::fillRGB(){
@@ -583,14 +616,14 @@ int main(int argc, char** argv){
 
 	Image im(imPath);
 	im.displayFilter(0);
-	/*
+	
 	im.displayFilter(1);
 	im.displayFilter(2);
 	im.displayFilter(3);
 	im.displayFilter(4);
 	im.displayFilter(5);
 	im.displayFilter(6);
-	*/
+	
 
 	CompressedImage compressedIm(im);
 	compressedIm.displayFilter(0);
