@@ -12,4 +12,7 @@
 04/19/2016: 5 hours - Team meeting restructuring our program using inheritance and composition
 04/22/2016: 1 hour - Team meeing fixing git repository issue after messed up merge 
 04/24/2016: 2 hours - Team meeting finishing Image class
-
+04/24/2016: 2 h 40 m - Group pair programming to work on the SubImage 
+04/24/2016: 3 h 30 m - Group pair programming working on the CompressedImage 
+04/25/2016: 30 m - Research on discrete cosine transform
+04/25/2016: 2 h 30 m - Group meeting: pair programming re-combination of subImages
