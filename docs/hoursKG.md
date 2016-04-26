@@ -16,3 +16,4 @@
 04/24/2016: 3 h 30 m - Group pair programming working on the CompressedImage 
 04/25/2016: 30 m - Research on discrete cosine transform
 04/25/2016: 2 h 30 m - Group meeting: pair programming re-combination of subImages
+04/25-04/26/2016: 4 h 50 m - Group meeting: pair programming 
