@@ -138,11 +138,35 @@ void CompressedImage::compressYCbCrAverages(SubImage si){
 //the main compression algorithm of performing a Discrete Cosine Transform
 //and then quantizing that matrix with 
 void CompressedImage::compressDiscreteCosine(SubImage csi){
+
+	// Copy the values from SubImage into 3d vector
+	int Y, Cb, Cr;
+	vector< vector< vector<int> > > YCbCr;
+	vector< vector<int> > tmpYCbCr;
+	vector<int> innerTmpYCbCr;
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			Y = getYCbCr(i, j, 0);
+			Cb = getYCbCr(i, j, 1);
+			Cr = getYCbCr(i, j, 2);
+
+			innerTmpYCbCr.push_back(Y);
+			innerTmpYCbCr.push_back(Cb);
+			innerTmpYCbCr.pysh_back(Cr);
+
+			tmpYCbCr.push_back(innerTmpYCbCr);
+			innerTmpYCbCr.clear();
+		}
+		YCbCr.push_back(tmpYCbCr);
+		tmpYCbCr.clear();
+	} 
+
+
 	//the arrays will contain the DCT data for the subimage
 	double G_Y[8][8] = {0};
 	double G_Cb[8][8] = {0};
 	double G_Cr[8][8] = {0};
-	
+	i
 	//perform the DCT
 	double alpha_u = 1, alpha_v = 1;
 	double F = 0;
@@ -156,7 +180,7 @@ void CompressedImage::compressDiscreteCosine(SubImage csi){
 					for(int y = 0; y < 8; y++){
 						cos1 = cos(((2*x + 1)*M_PI*u)/16);
 						cos2 = cos(((2*y + 1)*M_PI*v)/16);
-						F += (csi.YCbCr[x][y][i] - 128)*cos1*cos2;
+						F += (YCbCr[x][y][i] - 128)*cos1*cos2;
 					}
 				}
 				F = F * (1/4) * alpha_u * alpha_v;
@@ -242,8 +266,45 @@ void CompressedImage::compressDiscreteCosine(SubImage csi){
 		}
 	}
 
-	
 
+	// Inverse DCT
+	// loop through Y, Cb, Cr
+	for(int i = 0; i < 3; i++){
+		// loop through subImage pixels
+		for(int x = 0; x < 8; x++){
+			for(int y = 0; y < 8; y++){
+				YCbCr[x][y][i] = 0;
+				for(int u = 0; u < 8; u++){
+					for(int v = 0; v < 8; v++){
+						if(u == 0) alpha_u = 1/sqrt(2);
+						else alpha_u = 1;
+						if(v == 0) alpha_v = 1/sqrt(2);
+						else alpha_v = 1;
+						cos1 = cos(((2*x + 1)*M_PI*u)/16);
+						cos2 = cos(((2*y + 1)*M_PI*v)/16);
+
+						// Calculate the Inverse Discrete Cosine Transform
+						if(i == 0){
+							YCbCr[x][y][0] += alpha_u * alpha_v * G_Y[u][v] * cos1 * cos2;
+						}else if(i == 1){
+							YCbCr[x][y][1] += alpha_u * alpha_v * G_Cb[u][v] * cos1 * cos2;
+						}else if(i == 2){
+							YCbCr[x][y][2] += alpha_u * alpha_v * G_Cr[u][v] * cos1 * cos2;
+						}
+					}
+				}
+
+				// set the YCbCr values
+				if(i == 0){
+					csi.setYCbCr(x, y, 0, (YCbCr[x][y][0] / 4) + 128);
+				}else if(i == 1){
+					csi.setYCbCr(x, y, 1, (YCbCr[x][y][1] / 4) + 128);
+				}else if(i == 2){
+					csi.setYCbCr(x, y, 2, (YCbCr[x][y][2] / 4) + 128);
+				}
+			}
+		}
+	}
 }
 
 //displays a filter or the original based on the int passed (0-6)

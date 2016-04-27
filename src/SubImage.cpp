@@ -153,4 +153,10 @@ vector< vector< vector<int> > > SubImage::getYCbCr(){
         return YCbCr;
 }
 
+int SubImage::getYCbCr(int i, int j, int n){
+        return YCbCr[i][j][n];
+}
 
+void SubImage::setYCbCr(int x, int y, int index, int value){
+        YCbCr[x][y][index] = value;
+}

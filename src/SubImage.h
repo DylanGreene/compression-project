@@ -33,7 +33,9 @@ class SubImage{
 		int getCol();
 		vector< vector< vector<int> > > getRGB();
 		int getRGB(int i, int j, int n);
+		int getYCbCr(int i, int j, int n);
 		vector< vector< vector<int> > > getYCbCr();
+		void setYCbCr(int i, int j, int n, int v);		
 
 	private:
 		Mat subIm; //the sub image
