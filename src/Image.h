@@ -17,7 +17,12 @@
 #include <opencv2/highgui/highgui.hpp> //contains functions for input and output
 #include <iostream>
 #include <vector>
+#include <string>
 
+#include "SubImage.h"
+
+using namespace cv; //OpenCV namespace
+using namespace std;
 
 class Image{ 
 	public:

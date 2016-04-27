@@ -28,6 +28,11 @@
 #include <iostream>
 #include <vector>
 
+#include "Image.h"
+
+using namespace cv; //OpenCV namespace
+using namespace std;
+
 
 class CompressedImage: public Image{
 	public:

@@ -19,6 +19,9 @@
 #include <iostream>
 #include <vector>
 
+using namespace cv; //OpenCV namespace
+using namespace std;
+
 
 class SubImage{ 
 	public:

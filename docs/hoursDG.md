@@ -22,3 +22,4 @@
 04/25/2016: 2 h 30 m - Trying to implement the recobination of SubImages into a single CompressedImage
 04/25/2016: 4 h 50 m - Group pair programming working on implementing the down sampling aspect of the compression
 04/26/2016: 1 h 40 m - Restructing classes, making separate .h and .cpp files, documenting code by adding comments and explanations
+04/26/2016: 1 h 20 m - Finishing up splitting into .h and .cpp, also wrote a make file and a simple main.cpp

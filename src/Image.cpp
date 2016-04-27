@@ -15,8 +15,13 @@
 #include <iostream>
 #include <vector>
 
+#include "Image.h"
+#include "SubImage.h"
+#include "CompressedImage.h"
+
 using namespace cv; //OpenCV namespace
 using namespace std;
+
 
 //constructor
 Image::Image(){}
