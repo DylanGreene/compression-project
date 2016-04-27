@@ -1,0 +1,157 @@
+IMAGEn: Image Compression Program
+Dylan Greene and Kyle Gifaldi
+
+
+
+User Manual:
+
+Overview:
+--------
+
+	IMAGEn is a program which takes a user-specified image and uses aspects of the JPEG compression algorithm 
+(Down sample Chromiance values, Discrete Cosine Transform) to decrease the size of the image. IMAGEn 
+also has the functionality to six different filters of an image (Red, Green, Blue, Luminace, Blue Chromiance, 
+Red Chromiance). 
+
+
+	To achive compression, we implemented several steps within our program:
+
+		1) Get the RGB (Red, Green, Blue) values from the user-specified image
+
+			-   Using the OpenCV function imread, we instantiated an OpenCV Mat object with 
+				the	image as an argument. From here, the RGB values are stored within the
+				Mat objects <Vec3b> parameter.
+
+		2) Convert the RGB data into YCbCr data
+
+			-   This was achieved using Matrix multiplation
+
+		3) Split the image into 8x8 pixel-blocks of subImages
+
+			-	To achive this, we had to clone the original Image Mat for each sub image
+				because to display an OpenCV Mat, it was necessary that we first use the imread
+				function to get a displayable Mat. However, for each subImage, we only used and changed 
+				the data stored at each subImage's location within the larger Image. 
+
+		4) Perform the Discrete Cosine Tranform on each subImage's Y, Cb, and Cr
+
+			-   For each subImage, we loop through each pixel's YCbCr value then perform the 
+				Discrete Cosine Tranform on each pixel. The equation for the tranform
+				can be found at http://www.ams.org/samplings/feature-column/fcarc-image-compression
+
+		5) Quantize the resulting matrices
+
+			-	After the previous step, the program takes the resulting matrix,
+				creates a quatization table based on one user-defined variable q,
+				then divides the matrix by the table and stores this into a new matrix.
+				By now, we have a compressed matrix for the Y, the Cb, and the Cr values of 
+				each subImage.
+
+		6) Perform the Inverse Dicrete Cosine Tranform on each subImage's Y, Cb, and Cr
+	
+			-	Now, we inverse the Discrete Cosine Tranform equation one each matrix. 
+				This equation can be found at http://airccse.org/journal/ijcses/papers/5214ijcses04.pdf
+
+		7) Read in resulting values, conver, and save image
+
+			-   Now we can read the resulting compressed YCbCr values into our compressed image object 
+				and convert to RGB. From the RGB values, we write these values to our compressed 
+				image objects OpenCV Mat (at Vec<3b>) and save the compressed image.
+
+Librararies:
+-----------
+
+	Installation of OpenCV was easy for us on our first attempt since this site 
+(https://help.ubuntu.com/community/OpenCV) provides the following script to 
+install the OpenCV libaries:
+
+version="$(wget -q -O - http://sourceforge.net/projects/opencvlibrary/files/opencv-unix | egrep -m1 -o '\"[0-9](\.[0-9]+)+' | cut -c2-)"
+echo "Installing OpenCV" $version
+mkdir OpenCV
+cd OpenCV
+echo "Removing any pre-installed ffmpeg and x264"
+sudo apt-get -qq remove ffmpeg x264 libx264-dev
+echo "Installing Dependenices"
+sudo apt-get -qq install libopencv-dev build-essential checkinstall cmake pkg-config yasm libjpeg-dev libjasper-dev libavcodec-dev libavformat-dev libswscale-dev libdc1394-22-dev libxine-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libv4l-dev python-dev python-numpy libtbb-dev libqt4-dev libgtk2.0-dev libfaac-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev libtheora-dev libvorbis-dev libxvidcore-dev x264 v4l-utils ffmpeg cmake qt5-default checkinstall
+echo "Downloading OpenCV" $version
+wget -O OpenCV-$version.zip http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/$version/opencv-"$version".zip/download
+echo "Installing OpenCV" $version
+unzip OpenCV-$version.zip
+cd opencv-$version
+mkdir build
+cd build
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_OPENGL=ON ..
+make -j2
+sudo checkinstall
+sudo sh -c 'echo "/usr/local/lib" > /etc/ld.so.conf.d/opencv.conf'
+sudo ldconfig
+echo "OpenCV" $version "ready to be used"
+
+After running this script, the latest OpenCV libaries should be installed and ready to use.(one group member 
+used the the following stack overflow solution to fix a problem: http://stackoverflow.com/questions/15320267/package-opencv-was-not-found-in-the-pkg-config-search-path)
+However, all members of our group at one point needed to reinstall OpenCV for different reasonhis process was tedious and frustrating
+This process was tedious and frustrating as we tried several different installation methods online. 
+In the end, the installation instruction at the following site worked well in a linux environment and was
+used by both group members to reinstall the OpenCV libraries:
+
+http://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html#linux-installation
+
+
+Compilation:
+-----------
+
+	To compile a project, use the make command, then type ./compress_image [IMAGE], with IMAGE replaced 
+by the name of the image you wish to compress.
+
+
+Below is the Makefile which compiles our program:
+
+
+CC=g++
+CFLAGS=-`pkg-config opencv --cflags` `pkg-config opencv --libs`
+SOURCES=main.cpp Image.cpp SubImage.cpp CompressedImage.cpp
+EXECUTABLE=compress_image
+
+all: $(SOURCES) $(EXECUTABLE)
+
+$(EXECUTABLE): $(SOURCES)
+        $(CC) $(SOURCES) -o $(EXECUTABLE) `pkg-config --cflags --libs opencv` -std=gnu++11
+
+clean:
+        rm $(EXECUTABLE)
+
+
+
+
+
+User Interation:
+---------------
+
+
+
+
+Bugs:
+----
+
+
+	1) down sampling the chromiance values of the image cause the image to be slightly discolored 
+		(this process consists of averaging the blue and red chromiance values of each block of 
+		4 pixels so this is to be expected). Further, the size of the resulting image is larger than 
+		the original image. However, when we used the convert command to resize an image to a smaller
+		image, the resulting scaled image was shown to be twice the size of the original which did
+		not make sense to us. We were unsure of how to go about fixing this but since our assumption
+		was that an image of a smaller length and height would also take up less storage space (the
+		opposite was true in our experience).
+
+	2) After implementing the Discrete Cosine Tranform on each subImage, we get the resulting matrix which
+		contains several zeros where non-zero values were before (this is the purpose of the Discrete
+		Cosine Transform) yet don't beleive that this results in the compressed image taking up less space
+		than the original since we end up storing the zeros anyways (this should take up the same amount of 
+		space as storing non zeros). So our program does indeed perform the steps of the compression algorithm,
+		however, we are unsure of what to do with this compressed image other than write it to a OpenCV Mat file
+		and display it (which leads to no compression). 
+		
+
+	3) IMAGE SIZE???
+
+
