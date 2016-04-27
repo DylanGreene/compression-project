@@ -23,28 +23,20 @@ using namespace std;
  
 
 int main(int argc, char** argv){
+	
+	string imPath;
 
-    if(argc != 2){ //make sure valid usage
-     cout << " Usage: ./readAndDisp ImageToLoadAndDisplay" << endl;
+    if(argc > 2){ //make sure valid usage
+     cout << " Usage: ./compress_image [IMAGE]" << endl;
      return -1;
-    }
-	string imPath = argv[1];
+    }else if(argc == 2){
+		imPath = argv[1];
+	}
 
-	Image im(imPath);
-	im.displayFilter(0);
-	
-	im.displayFilter(1);
-	im.displayFilter(2);
-	im.displayFilter(3);
-	im.displayFilter(4);
-	im.displayFilter(5);
-	im.displayFilter(6);
-	
-
-	CompressedImage compressedIm(im);
-	compressedIm.displayFilter(0);
-
+	CLI interface(imPath ? imPath : );
+	interface.run();
 
 	waitKey(0); //wait for a keystroke in the window (parameter is how long it should wait in milli: 0 is forever)
     return 0;
 }
+

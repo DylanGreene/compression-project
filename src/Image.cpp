@@ -35,9 +35,11 @@ Image::Image(string fp){
 	* 	CV_LOAD_IMAGE_COLOR (>0) loads the image in the BGR format
 	*/
 
-	if(!image.data ){ //checking that image data was correctly loaded
-		cout << "Could not open or find the image" << endl ;
-		exit(-1);
+	while(!image.data ){ //checking that image data was correctly loaded
+		cout << "Could not open or find the image \"" << imagePath << "\"" << endl ;
+		cout << "Enter an image path: ";
+		cin >> imagePath;
+		image = imread(imagePath, CV_LOAD_IMAGE_COLOR); //read the image into a Mat 
 	}
 
 	//set the image width and height
