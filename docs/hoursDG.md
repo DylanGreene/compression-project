@@ -23,3 +23,5 @@
 04/25/2016: 4 h 50 m - Group pair programming working on implementing the down sampling aspect of the compression
 04/26/2016: 1 h 40 m - Restructing classes, making separate .h and .cpp files, documenting code by adding comments and explanations
 04/26/2016: 1 h 20 m - Finishing up splitting into .h and .cpp, also wrote a make file and a simple main.cpp
+04/27/2016: 1 h - Group meeting to figure out how to calculate the Q matrices for quanitization based on a q value to determine the quality of the compression and how compressed the image becomes
+04/27/2016: 3 h - Implented the DCT, the creation of quantization tables, and the application of quantizing the DCT

@@ -44,6 +44,7 @@ class CompressedImage: public Image{
 		Image image;
 		vector< vector<SubImage> > subIms;
 		vector< vector<SubImage> > compressedSubIms;
+		int q; // integer quality value between 0-100 (higher = better quality)
 		Mat compressedIm;
 		vector< vector< vector<int> > > RGB;
 		vector< vector< vector<int> > > YCbCr;
