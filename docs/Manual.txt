@@ -2,7 +2,6 @@ IMAGEn: Image Compression Program
 Dylan Greene and Kyle Gifaldi
 
 
-
 User Manual:
 
 Overview:
@@ -31,7 +30,8 @@ Red Chromiance).
 			-	To achive this, we had to clone the original Image Mat for each sub image
 				because to display an OpenCV Mat, it was necessary that we first use the imread
 				function to get a displayable Mat. However, for each subImage, we only used and changed 
-				the data stored at each subImage's location within the larger Image. 
+				the data stored at each subImage's location within the larger Image. Once the SubImages were
+				created, the first compression step was to downsample 2x2 blocks.
 
 		4) Perform the Discrete Cosine Tranform on each subImage's Y, Cb, and Cr
 
@@ -101,7 +101,7 @@ Compilation:
 -----------
 
 	To compile a project, use the make command, then type ./compress_image [IMAGE], with IMAGE replaced 
-by the name of the image you wish to compress.
+by the path and name of the image you wish to compress.
 
 
 Below is the Makefile which compiles our program:
@@ -127,7 +127,17 @@ clean:
 User Interation:
 ---------------
 
-
+To interact with the program, the user simply runs the executable by typing "./compress_image IMAGE" where IMAGE
+is the path to an image. This is image must have dimensions divisible by 8. At this point, the user is prompted
+with a menu of options. These options allow the user to display the orginal image, display the compressed image, 
+display filters for the different color space channels, or save any of those images to a file of thier choosing.
+This is all done by entering one of the options in the menu. Simply follow the prompts, and the inputs will be 
+executed and checked for errors. If an input is invalid, the user will be notified and have the chance to select
+an option again. If the user chooses to display an image or filter, they must click the 'x' on the image window 
+before selecting another option. Clicking the 'x' will not actually close the window until another display option
+is chosen. The user can select the save an image option. This wil allow the user to select the filter they want 
+to save and also enter a file path and name for where the image should be saved to. Once the user is done, 
+they can enter the option 'Q' to quit the program.
 
 
 Bugs:
@@ -139,7 +149,7 @@ Bugs:
 		4 pixels so this is to be expected). Further, the size of the resulting image is larger than 
 		the original image. However, when we used the convert command to resize an image to a smaller
 		image, the resulting scaled image was shown to be twice the size of the original which did
-		not make sense to us. We were unsure of how to go about fixing this but since our assumption
+		not make sense to us. We were unsure of how to go about fixing this since our assumption
 		was that an image of a smaller length and height would also take up less storage space (the
 		opposite was true in our experience).
 
@@ -150,8 +160,21 @@ Bugs:
 		space as storing non zeros). So our program does indeed perform the steps of the compression algorithm,
 		however, we are unsure of what to do with this compressed image other than write it to a OpenCV Mat file
 		and display it (which leads to no compression). 
-		
 
-	3) IMAGE SIZE???
+	3) The only type of image we can process is one that has both of it's dimensions divisible by 8. This
+		is due to the fact that our SubImage blocks must be 8x8 due to the algothim we use. However, since
+		we are using openCV Mats to store our images, we are unable to dynamically change the size (number of
+		rows and columns of pixels) dynamically. If we were able to do that, we would have simply added extra 
+		rows and columns to make the image divisible by 8 in both dimensions. Since this does not happen, our program
+		does not work at all with images that do not fit that criteria. This can be avoied by using Image magic to 
+		resize the image or simply by cropping the image.
+
+	4) When using the command line interface, the user is able to display filters or the compressed image or the 
+		original image. However, when the user does choose an option to display an image, due to the way 
+		OpenCV handles showing images with imshow, we were required to use a waitKey(0) command. This results in 
+		a bug where the user is unable to select another option until they click the x on the image window.
+		This will not actually close said window, which is another issue entirely, but will allow the user
+		to continue to use the program. However, it is definitely more finiky and unpredictable after an image or filter
+		has been opened. We could not find a better solution unfortunately.
 
 
