@@ -370,60 +370,7 @@ void CompressedImage::compressYCbCrAverages(SubImage si){
 }
 
 void CompressedImage::compressDiscreteCosine(SubImage csi){
-	double FMatrix[8][8] = {0}; 
-	int QMatrix[8][8] = 
-	{
-		{21,2,12,1,1,2,2,1,},
-		{21,2,12,1,1,2,2,1,},
-		{21,2,12,1,1,2,2,1,},
-		{21,2,12,1,1,2,2,1,},
-		{21,2,12,1,1,2,2,1,},
-		{21,2,12,1,1,2,2,1,},
-		{21,2,12,1,1,2,2,1,},
-		{21,2,12,1,1,2,2,1,}
-		
-	};
-	int BMatrix[8][8] = {0};
-
-	//Blue Chromiance forward DCT
-	double Cu = Cv = 1;
-	double F = 0;
-	double cos1, cos2;
-	for(int u = 0; u < 8; u++){
-		for(int v = 0; v < 8; v++){
-			if (u == 0) Cu = ( 1 / sqrt(2) );
-			if (v == 0) Cv = ( 1 / sqrt(2) );
-			for(int x = 0; x < 8; x++){
-				for(int y = 0; y < 8; u++){
-					// does cos1 go here or above this for?
-					cos1 = cos(( pi * u * ( 2*x + 1)) / 16 );
-					cos2 = cos(( pi * v * ( 2*y + 1)) / 16 );
-					F = F + csi.(YCbCr[x][y][1] - 128) * cos1 * cos2;
-				}
-			}
-			F = (1 / 4) * Cu * Cv * F;
-			Cu = Cv = 1;
-			F[u][v] = F;
-			F = 0;
-		}	
-	}
-	for(int i = 0; i < 8; i++){
-		for(int j = 0; j < 8; j++){
-			BMatrix[i][j] = int( FMatrix[i][j] / BMatrix[i][j] );
-		}
-	}
-
-	//Blue Chromiance backward DCT
-	for(int u = 0; u < 8; u++){
-		for(int v = 0; v < 8; v++){
-			for(int x = 0; x < 8; x++){
-				for(int y = 0; y < 8){
-					if (u == 0) Cu = ( 1 / sqrt(2) );
-					if (v == 0) Cv = ( 1 / sqrt(2) );
-				}
-			}
-		}
-	}
+	
 }
 
 //displays y, Cb or Cr based on the int passed (0-5)
