@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 
+#include "CLI.h"
 #include "Image.h"
 #include "CompressedImage.h"
 
@@ -24,19 +25,27 @@ CLI::CLI(){
 	cout << "Enter an image path: " << endl;
 	cin >> imagePath;
 
-	image(imPath);
-	compressed(image);
+	Image tmpIm(imagePath);
+	image = tmpIm;
 
-	runCLI(image);
+	CompressedImage tmpCIm(image);
+	compressed = tmpCIm;
+
+	run();
 	
 }
 
 CLI::CLI(string ip){
 
-	image(imPath);
-	compressed(image);
+	imagePath = ip;
 
-	runCLI(iamge);
+	Image tmpIm(imagePath);
+	image = tmpIm;
+
+	CompressedImage tmpCIm(image);
+	compressed = tmpCIm;
+
+	run();
 }
 
 void CLI::run(){
@@ -49,7 +58,7 @@ void CLI::run(){
 	while(true){
 		menu();
 		prompt();
-		
+		waitKey(0);	
 	}
 }
 
@@ -76,32 +85,25 @@ void CLI::prompt(){
 		done = true;
 		cout << endl << "\t\tChoose an option: ";
 		cin >> choice;
-		switch(choice){
-			case "0": 
-				image.displayFilter(0);
-				break;
-			case "1":
-				cout << "\t\tOrginal Image filter display options: " << endl;
-				filterPrompt();
-				break;
-			case "2":
-				compressed.displayFilter(0);
-				filterPrompt();
-				break;
-			case "3":
-				cout << "\t\tOrginal Image filter display options: " << endl;
-				break;
-			case "4":
-				cout << "\t\tWhich image would you like to write?: " << endl;
-				writePrompt();
-				break;
-			case "Q":
-				return;
-			default:
-				cout << "Not a valid option!" << endl;
-				menu();
-				done = false;
-				break;
+		if(choice == "0"){
+			image.displayFilter(0);
+		}else if(choice == "1"){
+			cout << "\t\tOrginal Image filter display options: " << endl;
+			filterPrompt(false);
+		}else if(choice == "2"){
+			compressed.displayFilter(0);
+		}else if(choice == "3"){
+			cout << "\t\tCompressed Image filter display options: " << endl;
+			filterPrompt(true);
+		}else if(choice == "4"){
+			cout << "\t\tWhich image would you like to write?: " << endl;
+			writePrompt();
+		}else if(choice == "Q"){
+			exit(0);
+		}else{
+			cout << "Not a valid option!" << endl;
+			menu();
+			done = false;
 		}
 	}
 }
@@ -110,8 +112,8 @@ void CLI::writePrompt(){
 	string choice = "";
 	bool isCompressed = false;
 	do{
-		cout << "\t\t\tWould you like ORGINAL(1) or COMPRESSED(2) image options (1 or 2): "
-		cin >> option;
+		cout << "\t\t\tWould you like ORGINAL(1) or COMPRESSED(2) image options (1 or 2): ";
+		cin >> choice;
 		if(choice != "1" && choice != "1"){
 			cout << "Invalid option" << endl;
 			continue;
@@ -128,6 +130,7 @@ void CLI::writePrompt(){
 			cout << "\t\t\tChoose an option for the compressed Image:" << endl;
 		}else{
 			cout << "\t\t\tChoose an option for the orginal Image:" << endl;
+		}
 
 		cout << "\t\t\t\tOptions:									0: Image" << endl;
 		cout << "\t\t\t\t1: Red Channel		2: Green Channel   		3: Blue Channel" << endl;
@@ -137,19 +140,19 @@ void CLI::writePrompt(){
 		cout << endl << "Choice: ";
 		cin >> choice;
 		
-		if(choice == 0){
+		if(choice == "0"){
 			(isCompressed) ? compressed.saveFilter(0) : image.saveFilter(0);
-		}else if(choice == 1){
+		}else if(choice == "1"){
 			(isCompressed) ? compressed.saveFilter(1) : image.saveFilter(1);
-		}else if(choice == 2){
+		}else if(choice == "2"){
 			(isCompressed) ? compressed.saveFilter(2) : image.saveFilter(2);
-		}else if(choice == 3){
+		}else if(choice == "3"){
 			(isCompressed) ? compressed.saveFilter(3) : image.saveFilter(3);
-		}else if(choice == 4){
+		}else if(choice == "4"){
 			(isCompressed) ? compressed.saveFilter(4) : image.saveFilter(4);
-		}else if(choice == 5)
+		}else if(choice == "5"){
 			(isCompressed) ? compressed.saveFilter(5) : image.saveFilter(5);
-		}else if(choice == 6)
+		}else if(choice == "6"){
 			(isCompressed) ? compressed.saveFilter(6) : image.saveFilter(6);
 		}else{
 			cout << "Invalid option!" << endl;
@@ -170,31 +173,26 @@ void CLI::filterPrompt(bool isCompressed){
 		done = true;
 		cout << endl << "Choice: ";
 		cin >> choice;
-		
-		switch (choice){
-			case "1":
-				(isCompressed) ? compressed.displayFilter(1) : image.displayFilter(1);
-				break;
-			case "2":
-				(isCompressed) ? compressed.displayFilter(2) : image.displayFilter(2);
-				break;
-			case "3":
-				(isCompressed) ? compressed.displayFilter(3) : image.displayFilter(3);
-				break;
-			case "4":
-				(isCompressed) ? compressed.displayFilter(4) : image.displayFilter(4);
-				break;
-			case "5":
-				(isCompressed) ? compressed.displayFilter(5) : image.displayFilter(5);
-				break;
-			case "6":
-				(isCompressed) ? compressed.displayFilter(6) : image.displayFilter(6);
-				break;
-			default:
-				cout << "Not a valid option!" << endl;
-				done = false;
-				break;
+			
+		if(choice == "0"){
+			(isCompressed) ? compressed.displayFilter(0) : image.displayFilter(0);
+		}else if(choice == "1"){
+			(isCompressed) ? compressed.displayFilter(1) : image.displayFilter(1);
+		}else if(choice == "2"){
+			(isCompressed) ? compressed.displayFilter(2) : image.displayFilter(2);
+		}else if(choice == "3"){
+			(isCompressed) ? compressed.displayFilter(3) : image.displayFilter(3);
+		}else if(choice == "4"){
+			(isCompressed) ? compressed.displayFilter(4) : image.displayFilter(4);
+		}else if(choice == "5"){
+			(isCompressed) ? compressed.displayFilter(5) : image.displayFilter(5);
+		}else if(choice == "6"){
+			(isCompressed) ? compressed.displayFilter(6) : image.displayFilter(6);
+		}else{
+			cout << "Invalid option!" << endl;
+			done = false;
 		}
 				
 	}
 }
+

@@ -222,3 +222,56 @@ vector< vector< vector<int> > > Image::getYCbCr(){
 }
 
 
+//saves a filter of the image based on the int passed (0-6)
+//0: Actual, 1: r, 2: g, 3: b, 4: Y, 5: Cb, 6: Cr
+void Image::saveFilter(int n){
+	cout << "Enter the file path you wish to save this filter as: ";
+	string pathToNewFile = "";
+	cin >> pathToNewFile;
+
+	//clone the image into a temp Mat to edit it to display filters
+	Mat tmp = image.clone();
+
+	//loop through all of the pixels of the temp Mat and adjust the
+	//color spaces to the appropriate one
+	for(int i = 0; i < height; i++){
+		for(int j = 0; j < width; j++){
+			
+			if(n == 0){
+				tmp.at<Vec3b>(i, j)[2] = RGB[i][j][0];
+				tmp.at<Vec3b>(i, j)[1] = RGB[i][j][1];
+				tmp.at<Vec3b>(i, j)[0] = RGB[i][j][2];
+			}else if(n == 1){	
+				tmp.at<Vec3b>(i, j)[2] = RGB[i][j][0];
+				tmp.at<Vec3b>(i, j)[1] = 0;
+				tmp.at<Vec3b>(i, j)[0] = 0;
+			}else if(n == 2){
+				tmp.at<Vec3b>(i, j)[2] = 0;
+				tmp.at<Vec3b>(i, j)[1] = RGB[i][j][1];
+				tmp.at<Vec3b>(i, j)[0] = 0;
+			}else if(n == 3){
+				tmp.at<Vec3b>(i, j)[2] = 0;
+				tmp.at<Vec3b>(i, j)[1] = 0;
+				tmp.at<Vec3b>(i, j)[0] = RGB[i][j][2];
+			}else if(n == 4){
+				tmp.at<Vec3b>(i, j)[2] = YCbCr[i][j][0]*0.2362797506;
+				tmp.at<Vec3b>(i, j)[1] = YCbCr[i][j][0]*0.2362797506;
+				tmp.at<Vec3b>(i, j)[0] = YCbCr[i][j][0]*0.2362797506;
+			}else if(n == 5){
+				tmp.at<Vec3b>(i, j)[2] = YCbCr[i][j][1]*-0.00000169;
+				tmp.at<Vec3b>(i, j)[1] = YCbCr[i][j][1]*-0.08131169;
+				tmp.at<Vec3b>(i, j)[0] = YCbCr[i][j][1]*0.41868831;
+			}else if(n == 6){
+				tmp.at<Vec3b>(i, j)[2] = YCbCr[i][j][2]*0.33126364;
+				tmp.at<Vec3b>(i, j)[1] = YCbCr[i][j][2]*-0.16873636;
+				tmp.at<Vec3b>(i, j)[0] = YCbCr[i][j][2]*0.0000037;
+			}
+		}
+	}
+	
+	//write the image file
+	imwrite(pathToNewFile, tmp);
+
+	cout << "The image has been written to: " << pathToNewFile << endl;
+}
+

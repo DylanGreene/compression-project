@@ -32,6 +32,7 @@ class Image{
 		//displays various filters based on n
 		//for n = 0: Original, 1: R, 2: G, 3: B, 4: Y, 5: Cb, 6: Cr
 		virtual void displayFilter(int n); 
+		virtual void saveFilter(int n);
 
 		//accessors
 		Mat getImage(); //returns the OpenCV Mat of the image

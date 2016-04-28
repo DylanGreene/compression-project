@@ -36,6 +36,7 @@ class SubImage{
 		int getYCbCr(int i, int j, int n);
 		vector< vector< vector<int> > > getYCbCr();
 		void setYCbCr(int i, int j, int n, int v);		
+		void setRGB(int i, int j, int n, int v);		
 
 	private:
 		Mat subIm; //the sub image

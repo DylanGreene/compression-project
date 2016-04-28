@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-`pkg-config opencv --cflags` `pkg-config opencv --libs`
-SOURCES=main.cpp Image.cpp SubImage.cpp CompressedImage.cpp
+SOURCES=main.cpp CLI.cpp Image.cpp SubImage.cpp CompressedImage.cpp
 EXECUTABLE=compress_image
 
 all: $(SOURCES) $(EXECUTABLE)

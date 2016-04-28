@@ -15,6 +15,7 @@
 #include <iostream>
 #include <vector>
 
+#include "CLI.h"
 #include "Image.h"
 #include "CompressedImage.h"
 
@@ -24,16 +25,16 @@ using namespace std;
 
 int main(int argc, char** argv){
 	
-	string imPath;
+	string imPath="";
 
-    if(argc > 2){ //make sure valid usage
+    if(argc != 2){ //make sure valid usage
      cout << " Usage: ./compress_image [IMAGE]" << endl;
      return -1;
-    }else if(argc == 2){
-		imPath = argv[1];
-	}
+    }
+	
+	imPath = argv[1];
 
-	CLI interface(imPath ? imPath : );
+	CLI interface(imPath);
 	interface.run();
 
 	waitKey(0); //wait for a keystroke in the window (parameter is how long it should wait in milli: 0 is forever)

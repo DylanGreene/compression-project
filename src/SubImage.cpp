@@ -160,3 +160,8 @@ int SubImage::getYCbCr(int i, int j, int n){
 void SubImage::setYCbCr(int x, int y, int index, int value){
         YCbCr[x][y][index] = value;
 }
+
+void SubImage::setRGB(int x, int y, int index, int value){
+        RGB[x][y][index] = value;
+}
+

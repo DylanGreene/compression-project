@@ -36,9 +36,13 @@ using namespace std;
 
 class CompressedImage: public Image{
 	public:
+		CompressedImage();
 		CompressedImage(Image im);
 		
+		//displays various filters based on n
+		//for n = 0: Original, 1: R, 2: G, 3: B, 4: Y, 5: Cb, 6: Cr
 		void displayFilter(int n);
+		void saveFilter(int n);
 
 	private:
 		Image image;
@@ -49,11 +53,12 @@ class CompressedImage: public Image{
 		vector< vector< vector<int> > > RGB;
 		vector< vector< vector<int> > > YCbCr;
 		void compressYCbCrAverages(SubImage si);
-		void compressDiscreteCosine(SubImage csi);
+		void compressDiscreteCosine(SubImage & csi);
 		
 		void compressSubIms();
 		void compressIm();
 		void fillRGB();
+		void writeRGB();
 		void fillYCbCr();
 };
 
