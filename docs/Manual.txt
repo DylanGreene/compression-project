@@ -161,6 +161,15 @@ Bugs:
 		however, we are unsure of what to do with this compressed image other than write it to a OpenCV Mat file
 		and display it (which leads to no compression). 
 
+		After implementing the Discrete Cosine Transform and displaying the resulting OpenCV Mat, something went 
+		wrong when the compressed YCbCr color space was transformed to the RGB color space (the outputted image 
+		displayed as one solid color). After analyzing our code, we believe that we implemented the Discrete Cosine 
+		Transform and its inverse correctly (as well as creating quantization tables) and speculate that we ignored 
+		a critical step in the jpeg compression process. We have therefore decided to comment out our call to the 
+		Discrete Cosine Transform function (compressedDiscreteCosine) and only use our function which down samples 
+		the chrominance values of each subImage.
+
+
 	3) The only type of image we can process is one that has both of it's dimensions divisible by 8. This
 		is due to the fact that our SubImage blocks must be 8x8 due to the algothim we use. However, since
 		we are using openCV Mats to store our images, we are unable to dynamically change the size (number of
