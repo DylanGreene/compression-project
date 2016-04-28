@@ -44,6 +44,10 @@ class CompressedImage: public Image{
 		void displayFilter(int n);
 		void saveFilter(int n);
 
+		//mutator for the quality
+		void setQuality(int n);
+
+
 	private:
 		Image image;
 		vector< vector<SubImage> > subIms;

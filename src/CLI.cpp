@@ -20,36 +20,47 @@
 
 using namespace std;
 
+//default constructor for when an image path is not used
 CLI::CLI(){
 	
+	//get a image path
 	cout << "Enter an image path: " << endl;
 	cin >> imagePath;
 
+	//instantiate an Image object using the image path
 	Image tmpIm(imagePath);
 	image = tmpIm;
 
+	//instantiate a CompressedImage object
 	CompressedImage tmpCIm(image);
 	compressed = tmpCIm;
 
+	//run the interface
 	run();
 	
 }
 
+//non default constructor for when an image path is passed
 CLI::CLI(string ip){
-
+	//set the imagepath
 	imagePath = ip;
 
+	//instantiate an Image object with that image
 	Image tmpIm(imagePath);
 	image = tmpIm;
 
+	//instantiate a CompressedImage object with the Image
 	CompressedImage tmpCIm(image);
 	compressed = tmpCIm;
-
+	
+	//run the interface
 	run();
 }
 
+//run the interface
 void CLI::run(){
 	
+	//print a welcome message
 	cout << "########################################################" << endl;
 	cout << "                Welcome to the IMAGEn                   " << endl;
 	cout << "########################################################" << endl;
@@ -58,10 +69,11 @@ void CLI::run(){
 	while(true){
 		menu();
 		prompt();
-		waitKey(0);	
+		waitKey(0);
 	}
 }
 
+//displays a menu of options
 void CLI::menu(){
 	//display compressed image
 	//dispaly a filter of original image
@@ -74,10 +86,13 @@ void CLI::menu(){
 	cout << "\t2: Display the compressed image" << endl;
 	cout << "\t3: Display a filter of the compressed image" << endl;
 	cout << "\t4: Write an image or filter to a file" << endl;
+	cout << "\t5: Adjust the compression quality" << endl;
 	cout << "\tQ: Quit the program" << endl;
 
 }
 
+//prompts the user to choose one of the main options 
+//has invalid input checking and also executes the option
 void CLI::prompt(){
 	string choice = "";
 	bool done = false;
@@ -88,33 +103,42 @@ void CLI::prompt(){
 		if(choice == "0"){
 			image.displayFilter(0);
 		}else if(choice == "1"){
-			cout << "\t\tOrginal Image filter display options: " << endl;
+			cout << endl << "Orginal Image filter display options: " << endl;
 			filterPrompt(false);
 		}else if(choice == "2"){
 			compressed.displayFilter(0);
 		}else if(choice == "3"){
-			cout << "\t\tCompressed Image filter display options: " << endl;
+			cout << endl << "Compressed Image filter display options: " << endl;
 			filterPrompt(true);
 		}else if(choice == "4"){
-			cout << "\t\tWhich image would you like to write?: " << endl;
+			cout << endl << "Which image would you like to write?: " << endl;
 			writePrompt();
+		}else if(choice == "5"){
+			cout << endl << "Enter the desired compression quality (1-100): ";
+			int q;
+			cin >> q;
+			compressed.setQuality(q);
 		}else if(choice == "Q"){
 			exit(0);
 		}else{
-			cout << "Not a valid option!" << endl;
+			cout << endl << "Invalid option!" << endl;
 			menu();
 			done = false;
 		}
 	}
 }
 
+//prompts the user for infomation about writing an image to a file
+//when the write option is selected from the main options
 void CLI::writePrompt(){
 	string choice = "";
+
+	//check if the user wants to save a version of the compressed image or the orginal
 	bool isCompressed = false;
 	do{
-		cout << "\t\t\tWould you like ORGINAL(1) or COMPRESSED(2) image options (1 or 2): ";
+		cout << endl << "\tWould you like ORGINAL(1) or COMPRESSED(2) image options (1 or 2): ";
 		cin >> choice;
-		if(choice != "1" && choice != "1"){
+		if(choice != "1" && choice != "2"){
 			cout << "Invalid option" << endl;
 			continue;
 		}else if(choice == "2"){
@@ -123,21 +147,22 @@ void CLI::writePrompt(){
 		break;
 	}while(true);
 
+	//give the options to save the various filters
 	bool done = false;
 	while(!done){
 
 		if(isCompressed){
-			cout << "\t\t\tChoose an option for the compressed Image:" << endl;
+			cout << "\tChoose an option for the compressed Image:" << endl;
 		}else{
-			cout << "\t\t\tChoose an option for the orginal Image:" << endl;
+			cout << "\tChoose an option for the orginal Image:" << endl;
 		}
 
-		cout << "\t\t\t\tOptions:									0: Image" << endl;
-		cout << "\t\t\t\t1: Red Channel		2: Green Channel   		3: Blue Channel" << endl;
-		cout << "\t\t\t\t4: Luminance  		5: Blue Chrominance		6: Red Chrominance" << endl;
+		cout << "\t\tOptions:									0: Image" << endl;
+		cout << "\t\t1: Red Channel		2: Green Channel   		3: Blue Channel" << endl;
+		cout << "\t\t4: Luminance  		5: Blue Chrominance		6: Red Chrominance" << endl;
 
 		done = true;
-		cout << endl << "Choice: ";
+		cout << endl << "\t\tChoice: ";
 		cin >> choice;
 		
 		if(choice == "0"){
@@ -155,23 +180,24 @@ void CLI::writePrompt(){
 		}else if(choice == "6"){
 			(isCompressed) ? compressed.saveFilter(6) : image.saveFilter(6);
 		}else{
-			cout << "Invalid option!" << endl;
+			cout << endl << "Invalid option!" << endl;
 			done = false;
 		}
 	}
 	
 }
 
-
+//prompts the user to select which filter they want to display when
+//they select display a filter from the main menu
 void CLI::filterPrompt(bool isCompressed){
 	string choice = "";
 	bool done = false;
 	while(!done){
-		cout << "\t\t\t1: Red Channel		2: Green Channel   		3: Blue Channel" << endl;
-		cout << "\t\t\t4: Luminance  		5: Blue Chrominance		6: Red Chrominance" << endl;
+		cout << "\t1: Red Channel		2: Green Channel   		3: Blue Channel" << endl;
+		cout << "\t4: Luminance  		5: Blue Chrominance		6: Red Chrominance" << endl;
 
 		done = true;
-		cout << endl << "Choice: ";
+		cout << endl << "\t\tChoice: ";
 		cin >> choice;
 			
 		if(choice == "0"){
@@ -189,7 +215,7 @@ void CLI::filterPrompt(bool isCompressed){
 		}else if(choice == "6"){
 			(isCompressed) ? compressed.displayFilter(6) : image.displayFilter(6);
 		}else{
-			cout << "Invalid option!" << endl;
+			cout << endl << "Invalid option!" << endl;
 			done = false;
 		}
 				

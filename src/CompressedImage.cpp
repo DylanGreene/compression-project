@@ -76,7 +76,8 @@ void CompressedImage::compressIm(){
 
 		}
 	}
-
+	
+	compressSubIms();
 	writeRGB();
 
 }
@@ -86,8 +87,8 @@ void CompressedImage::compressSubIms(){
 	//loop through the subImages, downspample, and then do the DCT
 	for(int i = 0; i < subIms.size(); i++){
 		for(int j = 0; j < subIms[0].size(); j++){
-			//compressYCbCrAverages(subIms[i][j]);
-			compressDiscreteCosine(compressedSubIms[i][j]);
+			compressYCbCrAverages(subIms[i][j]);
+			//compressDiscreteCosine(compressedSubIms[i][j]);
 		}
 	}
 }
@@ -291,11 +292,11 @@ void CompressedImage::compressDiscreteCosine(SubImage & csi){
 
 						// Calculate the Inverse Discrete Cosine Transform
 						if(i == 0){
-							compressedYCbCr[x][y][0] += alpha_u * alpha_v * G_Y[u][v] * cos1 * cos2;
+							compressedYCbCr[x][y][0] += alpha_u * alpha_v * B_Y[u][v] * cos1 * cos2;
 						}else if(i == 1){
-							compressedYCbCr[x][y][1] += alpha_u * alpha_v * G_Cb[u][v] * cos1 * cos2;
+							compressedYCbCr[x][y][1] += alpha_u * alpha_v * B_Cb[u][v] * cos1 * cos2;
 						}else if(i == 2){
-							YCbCr[x][y][2] += alpha_u * alpha_v * G_Cr[u][v] * cos1 * cos2;
+							compressedYCbCr[x][y][2] += alpha_u * alpha_v * B_Cr[u][v] * cos1 * cos2;
 						}
 					}
 				}
@@ -504,5 +505,16 @@ void CompressedImage::saveFilter(int n){
 	imwrite(pathToNewFile, tmp);
 
 	cout << "The image has been written to: " << pathToNewFile << endl;
+}
+
+//quality mutator
+void CompressedImage::setQuality(int n){
+	if(n < 1){
+		q = 1;
+	}else if(n > 99){
+		q = 99;
+	}else{
+		q = n;
+	}
 }
 

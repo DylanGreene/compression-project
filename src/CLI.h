@@ -25,21 +25,22 @@ using namespace std;
 
 class CLI{ 
 	public:
-		CLI();
-		CLI(string ip);
+		CLI(); //default constructor 
+		CLI(string ip); //non default constructor, takes an image path
 
-		void run();
+		void run(); //runs the interface
 
 	private:
-		string imagePath;
+		string imagePath; //path the the image being compressed
 
-		Image image;
-		CompressedImage compressed;
+		Image image; //image object
+		CompressedImage compressed; //compressed iamge object
 
-		void menu();
-		void prompt();
-		void filterPrompt(bool isCompressed);
-		void writePrompt();
+		//helper functions
+		void menu(); //prints the menu
+		void prompt(); //prompts the user to select something from the menu
+		void filterPrompt(bool isCompressed); //prompts the user to select what filter they want
+		void writePrompt(); //prompts the user to select where and what image they want to save
 
 };
 
